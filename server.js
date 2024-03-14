@@ -62,12 +62,11 @@ app.get('/stock-bg.jpg', (req, res) => {
 });
 
 app.post('/store-order', (req, res) => {
-    const orderData = req.body;
+    const { symbol, quantity, price } = req.body; // Extract form data
+    const orderData = { symbol, quantity, price }; // Create order object
 
-    // Assuming you want to store the order data in a JSON file named 'orders.json'
     const filePath = 'orders.json';
 
-    // Read existing orders from file, if any
     let existingOrders = [];
     try {
         existingOrders = JSON.parse(fs.readFileSync(filePath));
@@ -75,10 +74,8 @@ app.post('/store-order', (req, res) => {
         console.error('Error reading existing orders:', error);
     }
 
-    // Add the new order to the existing orders array
     existingOrders.push(orderData);
 
-    // Write updated orders back to the file
     try {
         fs.writeFileSync(filePath, JSON.stringify(existingOrders, null, 2));
         console.log('Order data stored successfully.');
@@ -88,6 +85,7 @@ app.post('/store-order', (req, res) => {
         res.status(500).send('Error storing order data.');
     }
 });
+
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -169,12 +167,10 @@ app.get('/historical-prices', (req, res) => {
 
 const wss = new WebSocket.Server({ port: 3003 });
 
-// Function to generate dummy price data
 function generateDummyPrice() {
-    return Math.random() * 1000; // Generate a random price
+    return Math.random() * 1000;
 }
 
-// Send dummy price data to all connected clients at regular intervals
 setInterval(() => {
     const priceData = {
         price: generateDummyPrice()

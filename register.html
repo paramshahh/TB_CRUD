@@ -10,14 +10,12 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-image: url('stock-bg.jpg');
-            /* Path to your background image */
             background-size: cover;
             background-position: center;
             margin: 0;
             padding: 0;
         }
 
-        /* Container styling */
         .container {
             max-width: 400px;
             margin: 100px auto;
@@ -27,7 +25,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Heading styling */
         h1 {
             text-align: center;
             color: #ffd700;
@@ -35,22 +32,18 @@
             padding: 10px;
             border-radius: 8px;
             margin-top: 0;
-            /* Remove default margin */
         }
 
-        /* Form group styling */
         .form-group {
             margin-bottom: 20px;
         }
 
-        /* Label styling */
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
 
-        /* Input field styling */
         input[type="text"],
         input[type="password"],
         input[type="email"],
@@ -61,31 +54,26 @@
             border-radius: 5px;
         }
 
-        /* Submit button styling */
         input[type="submit"] {
             background-color: #ffd700;
             color: #000;
             cursor: pointer;
         }
 
-        /* Submit button hover effect */
         input[type="submit"]:hover {
             background-color: #ffcc00;
         }
 
-        /* Switch link styling */
         .switch-link {
             text-align: center;
             margin-top: 20px;
         }
 
-        /* Link styling */
         .switch-link a {
             color: #007bff;
             text-decoration: none;
         }
 
-        /* Link hover effect */
         .switch-link a:hover {
             text-decoration: underline;
         }
@@ -94,11 +82,8 @@
 
 <body>
     <div class="container">
-        <!-- Heading -->
         <h1>Portfolio Dashboard</h1>
-        <!-- Registration form -->
         <form action="/register" method="POST">
-            <!-- Name field -->
             <div class="form-group">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" required>
