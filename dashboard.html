@@ -252,9 +252,54 @@
                 <input type="submit" value="Submit Order"
                     style="padding: 10px; background-color: #7bd229; color: #000; border: none; border-radius: 5px; cursor: pointer;">
             </form>
+            <div
+                style="border: 2px solid #ffffff; border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <h2
+                    style="background-color: #1a4d6f; color: #fff; padding: 15px 20px; border-top-left-radius: 10px; border-top-right-radius: 10px; margin: 0;">
+                    Price Data
+                </h2>
+                <div id="priceDataContainer" class="data-container" style="padding: 20px;">
+                    <!-- Content will be dynamically populated here -->
+                </div>
+            </div>
+
+            <div id="instructions"
+                style="border: 2px solid #ffffff; border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
+                <p style="margin: 0;">
+                    <strong>Instructions for Price Data:</strong>
+                </p>
+                <ol style="margin-top: 10px;">
+                    <li>Keep an eye on this section for real-time updates on price data.</li>
+                    <li>Any changes or updates to the displayed information will be reflected here automatically.</li>
+                    <li>You can interact with other elements on the page while monitoring the price data in this
+                        dedicated section.</li>
+                </ol>
+            </div>
+
 
 
             <script>
+
+                // Establish WebSocket connection to the server
+                const socket = new WebSocket('ws://localhost:3003');
+
+                // Handle WebSocket events
+                socket.onopen = function () {
+                    console.log('WebSocket connection established.');
+                };
+
+                socket.onmessage = function (event) {
+                    const priceData = JSON.parse(event.data);
+
+                    // Update the price data container with the received data
+                    const priceDataContainer = document.getElementById('priceDataContainer');
+                    priceDataContainer.innerHTML = `<p>Dummy Price: ${priceData.price}</p>`;
+                };
+
+                socket.onclose = function () {
+                    console.log('WebSocket connection closed.');
+                };
+
                 document.addEventListener('DOMContentLoaded', async function () {
                     // Fetch and populate profile data
                     fetch('profile_response.json')

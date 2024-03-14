@@ -1,19 +1,14 @@
-const express = require("express"); // Express framework for building web applications
-const bodyParser = require("body-parser"); // Middleware for parsing request bodies
-const path = require("path"); // Module for working with file and directory paths
-const fs = require("fs"); // File system module for reading and writing files
-const csv = require("csv-parser"); // Module for parsing CSV files
-const sqlite3 = require('sqlite3').verbose(); // SQLite module for working with databases
+const express = require("express");
+const bodyParser = require("body-parser");
+const path = require("path");
+const fs = require("fs");
+const csv = require("csv-parser");
+const sqlite3 = require('sqlite3').verbose();
+const WebSocket = require('ws');
 
-// Import required modules
-
-// Create an instance of the Express application
 const app = express();
-
-// Set the port number for the server
 const port = 3002;
 
-// Connect to the SQLite database
 const db = new sqlite3.Database('database.db', (err) => {
     if (err) {
         console.error('Error connecting to the database:', err);
@@ -22,21 +17,18 @@ const db = new sqlite3.Database('database.db', (err) => {
     }
 });
 
-// Configure middleware to parse request bodies
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Serve login.html when /login is requested
+// Serve login.html
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-// Serve register.html when /register is requested
+// Serve register.html
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'register.html'));
 });
-
-// Serve historical_data.csv as JSON when /historical-data is requested
 app.get('/historical-data', (req, res) => {
     const historicalData = [];
 
@@ -49,28 +41,26 @@ app.get('/historical-data', (req, res) => {
             res.json(historicalData);
         });
 });
-
-// Serve profile_response.json when /profile_response.json is requested
+// Serve profile_response.json at /profile_response.json
 app.get('/profile_response.json', (req, res) => {
     res.sendFile(path.join(__dirname, 'profile_response.json'));
 });
 
-// Serve holdings_response.json when /holdings_response.json is requested
+// Serve holdings_response.json at /holdings_response.json
 app.get('/holdings_response.json', (req, res) => {
     res.sendFile(path.join(__dirname, 'holdings_response.json'));
 });
-
-// Serve dashboard.html when /dashboard is requested
+// Serve dashboard.html
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
-// Serve stock-bg.jpg when /stock-bg.jpg is requested
+const usersFilePath = "users.json";
 app.get('/stock-bg.jpg', (req, res) => {
+    // Serve the image using Express's sendFile function
     res.sendFile(path.join(__dirname, 'stock-bg.jpg'));
 });
 
-// Store order data received via POST request to /store-order
 app.post('/store-order', (req, res) => {
     const orderData = req.body;
 
@@ -98,8 +88,6 @@ app.post('/store-order', (req, res) => {
         res.status(500).send('Error storing order data.');
     }
 });
-
-// Handle user login via POST request to /login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -118,8 +106,6 @@ app.post('/login', (req, res) => {
         }
     });
 });
-
-// Handle user registration via POST request to /register
 app.post('/register', (req, res) => {
     const { username, password } = req.body;
 
@@ -146,8 +132,7 @@ app.post('/register', (req, res) => {
         });
     });
 });
-
-// Serve holdings data when /holdings is requested
+// Serve holdings data
 app.get('/holdings', (req, res) => {
     try {
         const holdingsData = JSON.parse(fs.readFileSync("holdings_response.json", "utf8"));
@@ -158,7 +143,7 @@ app.get('/holdings', (req, res) => {
     }
 });
 
-// Serve profile data when /profile is requested
+// Serve profile data
 app.get('/profile', (req, res) => {
     try {
         const profileData = JSON.parse(fs.readFileSync("profile_response.json", "utf8")).data;
@@ -169,7 +154,7 @@ app.get('/profile', (req, res) => {
     }
 });
 
-// Serve historical prices data when /historical-prices is requested
+// Serve historical prices data
 app.get('/historical-prices', (req, res) => {
     const historicalPrices = [];
     fs.createReadStream('historical_prices.csv')
@@ -182,7 +167,24 @@ app.get('/historical-prices', (req, res) => {
         });
 });
 
-// Start the server and listen on the specified port
+const wss = new WebSocket.Server({ port: 3003 });
+
+// Function to generate dummy price data
+function generateDummyPrice() {
+    return Math.random() * 1000; // Generate a random price
+}
+
+// Send dummy price data to all connected clients at regular intervals
+setInterval(() => {
+    const priceData = {
+        price: generateDummyPrice()
+    };
+    wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(priceData));
+        }
+    });
+}, 1000);
 app.listen(port, () => {
     console.log("Server is running");
 });
